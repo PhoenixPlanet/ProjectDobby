@@ -6,7 +6,7 @@ pygame.init()
 # 게임 화면 설정
 screen = (720, 480)
 window = pygame.display.set_mode(screen)
-pygame.display.set_caption("Project Dobby")
+pygame.display.set_caption("Project Dobbys")
 # 게임 아이콘: 나중에 변경할 것
 # pygame.display.set_icon()
 
