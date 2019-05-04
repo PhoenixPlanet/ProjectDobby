@@ -1,5 +1,5 @@
 import pygame
-import sys
+from . import tiles
 
 pygame.init()
 
@@ -36,43 +36,13 @@ pYAcc = 0.5  # (0.5px * 60^2 / s^2)
 # 점프 세기
 jumpF = -8
 
-# 스프라이트 그룹
-tile_group = pygame.sprite.Group()
-enemy_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
-# 실제로 y방향 충돌을 감지하는 스프라이트: 자원을 낭비하므로 디버깅할 때만 사용할 것!
-dummy_group = pygame.sprite.Group()
+t_tile = tiles.Tile()
 
 
 def image_load(path, size):
     image = pygame.transform.scale(pygame.image.load(path), size)
 
     return image
-
-
-# 스프라이트 클래스들
-# 타일 클래스
-class Tile(pygame.sprite.Sprite):
-    def __init__(self, image_path, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = image_load(image_path, tileSize)
-        self.x, self.y = x, y
-        self.rect = pygame.Rect(self.x, self.y, 0, 0)
-        self.mask = pygame.mask.from_surface(self.image)
-
-    def set_pos(self, x, y):
-        self.x, self.y = x, y
-
-    def move(self, dx, dy):
-        self.x += dx
-        self.y += dy
-
-    def update(self):
-        self.rect.x, self.rect.y = self.x, self.y
-
-
-t_tile = Tile("./tiles/stage1_main7.png", 0, 0)
-tile_group.add(t_tile)
 
 
 class dummyPlayer(pygame.sprite.Sprite):
@@ -251,28 +221,3 @@ class Player(pygame.sprite.Sprite):
         # 위치 지정 및 땅 감지
         self.rect.x, self.rect.y = self.x, self.y
         self.check_ground()
-
-
-player1 = Player(10, 200)
-player_group.add(player1)
-
-
-while True:
-    clock.tick_busy_loop(FPS)
-
-    window.fill(SEMI_SKY)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            quit()
-            sys.exit()
-
-        '''if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:'''
-
-    tile_group.update()
-    tile_group.draw(window)
-
-    player_group.update()
-    player_group.draw(window)
-
-    pygame.display.flip()
