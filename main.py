@@ -26,8 +26,8 @@ WHITE = (255, 255, 255)
 SEMI_SKY = (214, 255, 255)
 
 # 플레이어 이동 속도, 애니메이션 프레임
-pXVel = 1
-animRate = 15
+pXVel = 2
+animRate = 12
 frameForAnim = 0
 
 # y방향 가속도(중력 가속도로 작용)
