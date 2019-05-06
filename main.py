@@ -58,10 +58,10 @@ def change_stage(new_background, new_tile, isNext=True):
 
     if isNext:
         a = ((6 * 720) / (data.changeStageSpeed ** 3))
-        b = ((6 * 600) / (data.changeStageSpeed ** 3))
+        b = ((6 * 639) / (data.changeStageSpeed ** 3))
     else:
         a = ((-6 * 720) / (data.changeStageSpeed ** 3))
-        b = ((-6 * 600) / (data.changeStageSpeed ** 3))
+        b = ((-6 * 639) / (data.changeStageSpeed ** 3))
 
     backgroundDX = a * ((t ** 2) - (data.changeStageSpeed * t))
     backgroundPos[0] += backgroundDX
@@ -115,7 +115,7 @@ while True:
         player_group.update()
         player_group.draw(window)
 
-        if player1.x >= 660 and stageNum < len(stageBackgroundImageList) - 1:
+        if player1.rect.centerx >= 680 and stageNum < len(stageBackgroundImageList) - 1:
             gameState = data.gameStateList["changeStage"]
             ticksForStageChange = 0
             backgroundPos = [0, 0]
@@ -127,7 +127,7 @@ while True:
             tilePreImage = t_tile.image
             tileNewImage = etcFuntions.image_load(stageTileImageList[stageNum], screen)
 
-        if player1.x <= 40 and stageNum > 0:
+        if player1.rect.centerx <= 40 and stageNum > 0:
             gameState = data.gameStateList["changeStage"]
             ticksForStageChange = 0
             backgroundPos = [0, 0]
