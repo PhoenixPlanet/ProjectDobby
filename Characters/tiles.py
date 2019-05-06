@@ -1,8 +1,9 @@
 import pygame
-from ..etc import etcFuntions
+from etc import etcFuntions
+import data
 
 # 게임 화면 설정(확인해본 결과 (1440, 960), (1280, 1080) 정도 되면 연산속도가 눈에 띌 정도로 느려짐)
-screen = (720, 480)
+screen = data.screen
 tileSize = screen
 
 
