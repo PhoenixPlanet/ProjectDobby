@@ -25,3 +25,9 @@ pYAcc = 0.5  # (0.5px * 60^2 / s^2)
 
 # 점프 세기
 jumpF = -8
+
+# 게임 흐름 상태 목록
+gameStateList = {"lobby": 0, "normal": 1, "changeStage": 2}
+
+# 스테이지 변경 속도 (단위: 프레임)
+changeStageSpeed = 90

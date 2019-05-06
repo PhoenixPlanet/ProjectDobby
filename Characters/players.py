@@ -157,13 +157,13 @@ class Player(pygame.sprite.Sprite):
         self.y += self.dy
 
         # 좌우 이동
-        if key[pygame.K_RIGHT]:
+        if key[pygame.K_RIGHT] and self.x < screen[0] - data.playerSize[0]:
             if self.direction == 1:
                 self.direction = 0
             self.dx = data.pXVel
             self.x_check_move(self.dx)
 
-        elif key[pygame.K_LEFT]:
+        elif key[pygame.K_LEFT] and self.x > 0:
             if self.direction == 0:
                 self.direction = 1
             self.dx = -data.pXVel
