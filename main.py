@@ -11,11 +11,12 @@ screen = data.screen
 window = pygame.display.set_mode(screen)
 pygame.display.set_caption("Project Dobby")
 background = etcFuntions.image_load("./background/stage1_background1.png", screen)
+lobbyBackground = etcFuntions.image_load("./background/lobby.png", screen)
 # 게임 아이콘: 나중에 변경할 것
 # pygame.display.set_icon()
 
 # 게임 흐름
-gameState = data.gameStateList["normal"]
+gameState = data.gameStateList["lobby"]
 stageNum = 0
 stageBackgroundImageList = ["./background/stage1_background1.png", "./background/stage1_background2.png"]
 stageTileImageList = ["./tiles/stage1_main1.png", "./tiles/stage1_main2.png"]
@@ -28,6 +29,7 @@ clock = pygame.time.Clock()
 tile_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+text_group = pygame.sprite.Group()
 # 실제로 y방향 충돌을 감지하는 스프라이트: 디버깅할 때만 사용하자
 dummy_group = pygame.sprite.Group()
 
@@ -104,7 +106,12 @@ while True:
         '''if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:'''
 
-    if gameState == data.gameStateList["normal"]:
+    if gameState == data.gameStateList["lobby"]:
+        window.fill(data.SEMI_SKY)
+        window.blit(lobbyBackground, (0, 0))
+
+
+    elif gameState == data.gameStateList["normal"]:
         window.fill(data.SEMI_SKY)
 
         window.blit(background, backgroundPos)
