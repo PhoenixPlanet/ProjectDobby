@@ -7,5 +7,5 @@ def image_load(path, size):
     return image
 
 
-def sizeUp(target, xsize):
-    return target * xsize
+def sizeUp(target):
+    return int(target * 1.2)

@@ -13,7 +13,7 @@ class dummyPlayer(pygame.sprite.Sprite):
         self.x, self.y, self.w, self.h = x, y, w, h
         self.dy = 0
         self.dx = 0
-        self.image = etcFuntions.image_load("./Player1/walking_dummy2.png", (w, h))
+        self.image = etcFuntions.image_load("./PlayerImages/walking_dummy2.png", (w, h))
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = self.x, self.y
         self.mask = pygame.mask.from_surface(self.image)
@@ -39,9 +39,9 @@ class Player(pygame.sprite.Sprite):
         self.walk_image = []
         for i in range(1, 10):
             self.walk_image.append(
-                etcFuntions.image_load("./Player1/alien_mint/p1_walk0" + str(i) + ".png", data.playerSize))
-        self.walk_image.append(etcFuntions.image_load("./Player1/alien_mint/p1_walk10.png", data.playerSize))
-        self.walk_image.append(etcFuntions.image_load("./Player1/alien_mint/p1_walk11.png", data.playerSize))
+                etcFuntions.image_load("./PlayerImages/alien_mint/p1_walk0" + str(i) + ".png", data.playerSize))
+        self.walk_image.append(etcFuntions.image_load("./PlayerImages/alien_mint/p1_walk10.png", data.playerSize))
+        self.walk_image.append(etcFuntions.image_load("./PlayerImages/alien_mint/p1_walk11.png", data.playerSize))
 
         self.rect = self.walk_image[0].get_rect()
         self.imageNum = 0

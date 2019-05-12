@@ -7,6 +7,9 @@ dummyMargin = int(playerSize[0] / 4.7)
 dummyPlayerSize = (playerSize[0] - dummyMargin*2, playerSize[1])
 tileSize = screen
 
+# 아이템 리스트
+itemList = {"stage1": {"type": "grass", "x": 12}}
+
 # FPS
 FPS = 60
 
