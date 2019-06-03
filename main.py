@@ -1,8 +1,10 @@
 import pygame
 import sys
-from etc import etcFuntions
+from etc import etcFuntions, gamedata, stageFunctions
 from SpriteClass import players, tiles, textSprites, guideSprites
 import data
+import os
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 pygame.init()
 
@@ -16,11 +18,6 @@ lobbyBackground = etcFuntions.image_load("./background/lobby.png", screen)
 # pygame.display.set_icon()
 
 # 게임 흐름
-gameState = data.gameStateList["lobby"]
-stageNum = 0
-stageBackgroundImageList = ["./background/stage1_background1.png", "./background/stage1_background2.png"]
-stageTileImageList = ["./tiles/stage1_main1.png", "./tiles/stage1_main2.png"]
-goNext = True
 isClicked = 0
 ticksForAll = 0
 storyLine = 0
@@ -29,94 +26,40 @@ storyLine = 0
 clock = pygame.time.Clock()
 
 # 스프라이트 그룹
-tile_group = pygame.sprite.Group()
-enemy_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
 text_group = pygame.sprite.Group()
 guide_group = pygame.sprite.Group()
-item_group = pygame.sprite.Group()
 # 실제로 y방향 충돌을 감지하는 스프라이트: 디버깅할 때만 사용하자
 dummy_group = pygame.sprite.Group()
 
-# 스프라이트
-t_tile = tiles.Tile("./tiles/stage1_main1.png", 0, 0)
-tile_group.add(t_tile)
-
-player1 = players.Player(50, 200, t_tile)
-player_group.add(player1)
+# 스프라이트 그룹들을 모아놓은 클래스
+sprite_groups = gamedata.SpriteGroups()
+sprite_groups.add_tile("./tiles/stage1_main1.png", 0, 0)
+sprite_groups.init_player(50, 200)
 
 howToMoveSprite = 0
 
-# 스테이지 관련 변수들
-backgroundPos = [0, 0]
-ticksForStageChange = 0
-
-backgroundPreImage = 0
-backgroundNewImage = 0
-tilePreImage = 0
-tileNewImage = 0
-backgroundDX = 0
-playerDxForChangeStage = 0
-playerPosForChangeStage = []
-
+gameFlowData = gamedata.GameData()
 
 # def set_stage(stageNumber):
-
-
-def change_stage(new_background, new_tile, isNext=True):
-    global background, backgroundPos, backgroundDX, gameState,\
-        playerDxForChangeStage, t_tile, player1, ticksForStageChange
-
-    window.fill(data.SEMI_SKY)
-
-    t = ticksForStageChange
-
-    if isNext:
-        a = ((6 * 720) / (data.changeStageSpeed ** 3))
-        b = ((6 * 639) / (data.changeStageSpeed ** 3))
-    else:
-        a = ((-6 * 720) / (data.changeStageSpeed ** 3))
-        b = ((-6 * 639) / (data.changeStageSpeed ** 3))
-
-    backgroundDX = a * ((t ** 2) - (data.changeStageSpeed * t))
-    backgroundPos[0] += backgroundDX
-
-    if isNext:
-        newX = backgroundPos[0] + screen[0]
-    else:
-        newX = backgroundPos[0] - screen[0]
-
-    window.blit(backgroundPreImage, backgroundPos)
-    window.blit(backgroundNewImage, (newX, backgroundPos[1]))
-    window.blit(tilePreImage, backgroundPos)
-    window.blit(tileNewImage, (newX, backgroundPos[1]))
-
-    playerDxForChangeStage = b * ((t ** 2) - (data.changeStageSpeed * t))
-    playerPosForChangeStage[0] += playerDxForChangeStage
-    player1.pos(playerPosForChangeStage[0], playerPosForChangeStage[1])
-    player_group.draw(window)
-
-    if t == data.changeStageSpeed:
-        background = etcFuntions.image_load(new_background, screen)
-        gameState = data.gameStateList["normal"]
-        t_tile.kill()
-        t_tile = tiles.Tile(new_tile, 0, 0)
-        player1.t_tile = t_tile
-        tile_group.add(t_tile)
-        backgroundPos = (0, 0)
-
-    ticksForStageChange += 1
 
 
 def initialize():
     global gameState, stageNum
 
+    item_file = open("./itemContentLists/stage1.txt", "r")
+    item_list = item_file.read().split("\n")
+    item_groups = gamedata.ItemGroups(item_list)
+    item_file.close()
+
     text_group.add(textSprites.Text(70, 140, (110, 60), "./textImage/play.png", "play"))
-    gameState = data.gameStateList["lobby"]
-    stageNum = 0
+    gameFlowData.gameState = data.gameStateList["lobby"]
+    gameFlowData.stageNum = 0
+
+    return item_groups
 
 
-initialize()
+item_group = initialize()
+
 
 while True:
     clock.tick_busy_loop(data.FPS)
@@ -131,7 +74,7 @@ while True:
         '''if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:'''
 
-    if gameState == data.gameStateList["lobby"]:
+    if gameFlowData.gameState == data.gameStateList["lobby"]:
         window.fill(data.SEMI_SKY)
         window.blit(lobbyBackground, (0, 0))
 
@@ -142,26 +85,15 @@ while True:
                 if pygame.mouse.get_pressed()[0] and isClicked == 0:
                     isClicked = 1
                     if t.text == "play":
-                        gameState = data.gameStateList["normal"]
+                        gameFlowData.gameState = data.gameStateList["normal"]
                         ticksForAll = 0
 
-    elif gameState == data.gameStateList["normal"]:
+    elif gameFlowData.gameState == data.gameStateList["normal"]:
         window.fill(data.SEMI_SKY)
-        window.blit(background, backgroundPos)
+        window.blit(gameFlowData.background, gameFlowData.backgroundPos)
 
-        tile_group.update()
-        tile_group.draw(window)
-
-        player_group.update()
-        player_group.draw(window)
-
-        dummy_player_rect = pygame.Rect((player1.x - 5, player1.y), (data.playerSize[0] + 10, data.playerSize[1]))
-
-        for item in item_group:
-            if dummy_player_rect.colliderect(item.rect):
-                item.detectPlayer = True
-            else:
-                item.detectPlayer = False
+        item_group.update_item(window)
+        sprite_groups.update_sprites(window)
 
         if ticksForAll == 100:
             howToMoveSprite = guideSprites.Guide(0, 20, (132, 93), "./guideImage/guide1.png", "howToMove")
@@ -174,35 +106,17 @@ while True:
         elif ticksForAll > 500:
             howToMoveSprite.kill()
 
-        if player1.rect.centerx >= 680 and stageNum < len(stageBackgroundImageList) - 1:
-            gameState = data.gameStateList["changeStage"]
-            ticksForStageChange = 0
-            backgroundPos = [0, 0]
-            stageNum += 1
-            goNext = True
-            playerPosForChangeStage = [player1.x, player1.y]
-            backgroundPreImage = background
-            backgroundNewImage = etcFuntions.image_load(stageBackgroundImageList[stageNum], screen)
-            tilePreImage = t_tile.image
-            tileNewImage = etcFuntions.image_load(stageTileImageList[stageNum], screen)
+        if sprite_groups.player.rect.centerx >= 680 and gameFlowData.stageNum < len(gameFlowData.stageBackgroundImageList) - 1:
+            gameFlowData.init_stage(sprite_groups, True)
 
-        if player1.rect.centerx <= 40 and stageNum > 0:
-            gameState = data.gameStateList["changeStage"]
-            ticksForStageChange = 0
-            backgroundPos = [0, 0]
-            stageNum -= 1
-            goNext = False
-            playerPosForChangeStage = [player1.x, player1.y]
-            backgroundPreImage = background
-            backgroundNewImage = etcFuntions.image_load(stageBackgroundImageList[stageNum], screen)
-            tilePreImage = t_tile.image
-            tileNewImage = etcFuntions.image_load(stageTileImageList[stageNum], screen)
+        if sprite_groups.player.rect.centerx <= 40 and gameFlowData.stageNum > 0:
+            gameFlowData.init_stage(sprite_groups, False)
 
-    elif gameState == data.gameStateList["changeStage"]:
-        change_stage(stageBackgroundImageList[stageNum], stageTileImageList[stageNum], goNext)
+    elif gameFlowData.gameState == data.gameStateList["changeStage"]:
+        stageFunctions.change_stage(window, gameFlowData, sprite_groups, item_group)
 
-    fontObj = pygame.font.Font('freesansbold.ttf', 16)
-    textSurfaceObj = fontObj.render("x: %d, y: %d" % (pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), True, (0, 0, 0), (255, 255, 255))
+    fontObj = pygame.font.Font('./Fonts/NanumBarunpenR.ttf', 16)
+    textSurfaceObj = fontObj.render("x: %d, y: %d" % (pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), True, (0, 0, 0))
     textRectObj = textSurfaceObj.get_rect()
     textRectObj.center = (360, 10)
     window.blit(textSurfaceObj, textRectObj)

@@ -70,9 +70,9 @@ class Player(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
-    def pos(self, x, y):
-        self.x = x
-        self.y = y
+    def pos(self, pos):
+        self.x = pos[0]
+        self.y = pos[1]
         self.rect.x, self.rect.y = self.x, self.y
 
     # x 방향으로 움직이는 것이 가능한 지 확인할 것!

@@ -7,9 +7,6 @@ dummyMargin = int(playerSize[0] / 4.7)
 dummyPlayerSize = (playerSize[0] - dummyMargin*2, playerSize[1])
 tileSize = screen
 
-# 아이템 리스트
-itemList = {"stage1": {"type": "grass", "x": 12}}
-
 # FPS
 FPS = 60
 
@@ -19,7 +16,7 @@ WHITE = (255, 255, 255)
 SEMI_SKY = (214, 255, 255)
 
 # 플레이어 이동 속도, 애니메이션 프레임
-pXVel = 1
+pXVel = 2
 animRate = 3
 frameForAnim = 0
 
@@ -34,3 +31,12 @@ gameStateList = {"lobby": 0, "normal": 1, "changeStage": 2}
 
 # 스테이지 변경 속도 (단위: 프레임)
 changeStageSpeed = 90
+
+
+def loadGameData(stageNum):
+    itemFile = open("./ItemContentLists/stage"+str(stageNum)+".txt", 'r')
+    loadList = itemFile.read().split("\n")
+    result = []
+    for i in loadList:
+        result.append(i.split())
+
