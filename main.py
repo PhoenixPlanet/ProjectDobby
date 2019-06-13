@@ -110,7 +110,6 @@ while True:
         window.fill(data.SEMI_SKY)
         window.blit(lobbyBackground, (0, 0))
 
-
     elif gameState == data.gameStateList["normal"]:
         window.fill(data.SEMI_SKY)
 
