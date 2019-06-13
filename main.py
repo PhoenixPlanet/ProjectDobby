@@ -4,6 +4,7 @@ from etc import etcFuntions, gamedata, stageFunctions
 from SpriteClass import players, tiles, textSprites, guideSprites
 import data
 import os
+
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 pygame.init()
@@ -42,13 +43,12 @@ gameFlowData = gamedata.GameData()
 
 # def set_stage(stageNumber):
 
-
 def initialize():
     global gameState, stageNum
 
     item_file = open("./itemContentLists/stage1.txt", "r")
     item_list = item_file.read().split("\n")
-    item_groups = gamedata.ItemGroups(item_list)
+    item_groups = gamedata.ItemGroups(item_list, window)
     item_file.close()
 
     text_group.add(textSprites.Text(70, 140, (110, 60), "./textImage/play.png", "play"))
@@ -59,7 +59,6 @@ def initialize():
 
 
 item_group = initialize()
-
 
 while True:
     clock.tick_busy_loop(data.FPS)
@@ -92,12 +91,17 @@ while True:
         window.fill(data.SEMI_SKY)
         window.blit(gameFlowData.background, gameFlowData.backgroundPos)
 
-        item_group.update_item(window)
+        item_group.update_item()
         sprite_groups.update_sprites(window)
 
         if ticksForAll == 100:
             howToMoveSprite = guideSprites.Guide(0, 20, (132, 93), "./guideImage/guide1.png", "howToMove")
-            howToMoveSprite.rect.centerx = 360
+            """howToMoveSprite = guideSprites.ItemGuide((200, 200), (100, 100), "Type\n"
+                                                                             "Rock\n"
+                                                                             "Return\n"
+                                                                             "Rock\n"
+                                                                             "Return Value\n"
+                                                                             "3", (0, 0))"""
             guide_group.add(howToMoveSprite)
 
         elif 500 >= ticksForAll > 100:
@@ -106,7 +110,8 @@ while True:
         elif ticksForAll > 500:
             howToMoveSprite.kill()
 
-        if sprite_groups.player.rect.centerx >= 680 and gameFlowData.stageNum < len(gameFlowData.stageBackgroundImageList) - 1:
+        if sprite_groups.player.rect.centerx >= 680 and gameFlowData.stageNum < len(
+                gameFlowData.stageBackgroundImageList) - 1:
             gameFlowData.init_stage(sprite_groups, True)
 
         if sprite_groups.player.rect.centerx <= 40 and gameFlowData.stageNum > 0:
@@ -115,8 +120,10 @@ while True:
     elif gameFlowData.gameState == data.gameStateList["changeStage"]:
         stageFunctions.change_stage(window, gameFlowData, sprite_groups, item_group)
 
-    fontObj = pygame.font.Font('./Fonts/NanumBarunpenR.ttf', 16)
-    textSurfaceObj = fontObj.render("x: %d, y: %d" % (pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), True, (0, 0, 0))
+    # fontObj = pygame.font.Font('./Fonts/caviar_dreams/CaviarDreams.ttf', 16)
+    fontObj = pygame.font.Font('./Fonts/NanumGothic.ttf', 16)
+    textSurfaceObj = fontObj.render("x: %d, y: %d" % (pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), True,
+                                    (0, 0, 0))
     textRectObj = textSurfaceObj.get_rect()
     textRectObj.center = (360, 10)
     window.blit(textSurfaceObj, textRectObj)

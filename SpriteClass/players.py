@@ -146,7 +146,7 @@ class Player(pygame.sprite.Sprite):
         self.dy += data.pYAcc
 
         # 점프
-        if key[pygame.K_UP] or key[pygame.K_SPACE]:
+        if key[pygame.K_w] or key[pygame.K_SPACE]:
             if self.jumpState:
                 self.y -= 1
                 self.rect.y = self.y
@@ -157,13 +157,13 @@ class Player(pygame.sprite.Sprite):
         self.y += self.dy
 
         # 좌우 이동
-        if key[pygame.K_RIGHT] and self.x < screen[0] - data.playerSize[0]:
+        if key[pygame.K_d] and self.x < screen[0] - data.playerSize[0]:
             if self.direction == 1:
                 self.direction = 0
             self.dx = data.pXVel
             self.x_check_move(self.dx)
 
-        elif key[pygame.K_LEFT] and self.x > 0:
+        elif key[pygame.K_a] and self.x > 0:
             if self.direction == 0:
                 self.direction = 1
             self.dx = -data.pXVel

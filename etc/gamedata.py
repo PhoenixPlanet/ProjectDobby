@@ -1,7 +1,7 @@
 from . import etcFuntions
 import data
 import pygame
-from SpriteClass import tiles, players, itemSprites
+from SpriteClass import tiles, players, itemSprites, guideSprites
 
 
 class GameData:
@@ -56,6 +56,7 @@ class SpriteGroups:
         self.player_group = pygame.sprite.Group()
         self.text_group = pygame.sprite.Group()
         self.guide_group = pygame.sprite.Group()
+
         self.player = 0
         self.t_tile = 0
 
@@ -80,14 +81,15 @@ class SpriteGroups:
 
 
 class ItemGroups:
-    def __init__(self, itemList):
+    def __init__(self, itemList, window):
         self.item_group = pygame.sprite.Group()
+        self.window = window
 
         self.itemList = itemList
         for i in itemList:
-            self.item_group.add(itemSprites.Item(i.split()))
+            self.item_group.add(itemSprites.Item(i.split(), self.window))
 
-    def update_item(self, window):
+    def update_item(self):
         self.item_group.update()
-        self.item_group.draw(window)
+        self.item_group.draw(self.window)
 
