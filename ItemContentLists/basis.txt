@@ -1,1 +1,1 @@
-타입 x bottomY width height 내구도 리턴타입 리턴값
+타입 x bottomY width height 내구도 리턴타입 리턴값 marginX marginY

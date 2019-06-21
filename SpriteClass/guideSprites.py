@@ -2,6 +2,23 @@ import pygame
 from etc import etcFuntions
 
 
+class LifeBar:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.outer = pygame.Rect((self.x, self.y), (10, 1))
+        self.inner = pygame.Rect((self.x + 0.2, self.y + 0.1), (9.6, 0.8))
+
+    def draw(self, window, x, y, life, max_life):
+        self.x, self.y = x, y
+        self.outer.x, self.outer.y = self.x, self.y
+        self.inner.x = self.outer.x + 0.2
+        self.inner.y = self.outer.y + 0.1
+        self.inner.width = (float(life) / max_life) * 9.6
+        pygame.draw.rect(window, (0, 0, 0), self.outer)
+        pygame.draw.rect(window, (255, 0, 0), self.inner)
+
+
 class Guide(pygame.sprite.Sprite):
     def __init__(self, x, y, size, path, text):
         pygame.sprite.Sprite.__init__(self)
@@ -22,7 +39,7 @@ class MouseGuide(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.x = 0
         self.y = 0
-        self.image = etcFuntions.image_load("./guideImage/glassPanel_cornerBL.png", (1, 1))
+        self.image = etcFuntions.image_load("./PlayerImages/walking_dummy2.png", (1, 1))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 

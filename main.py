@@ -95,13 +95,7 @@ while True:
         sprite_groups.update_sprites(window)
 
         if ticksForAll == 100:
-            howToMoveSprite = guideSprites.Guide(0, 20, (132, 93), "./guideImage/guide1.png", "howToMove")
-            """howToMoveSprite = guideSprites.ItemGuide((200, 200), (100, 100), "Type\n"
-                                                                             "Rock\n"
-                                                                             "Return\n"
-                                                                             "Rock\n"
-                                                                             "Return Value\n"
-                                                                             "3", (0, 0))"""
+            howToMoveSprite = guideSprites.Guide(300, 20, (132, 93), "./guideImage/guide1.png", "howToMove")
             guide_group.add(howToMoveSprite)
 
         elif 500 >= ticksForAll > 100:

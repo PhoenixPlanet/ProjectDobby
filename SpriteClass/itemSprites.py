@@ -15,25 +15,30 @@ class Item(pygame.sprite.Sprite):
         self.width = int(itemData[3])
         self.height = int(itemData[4])
         self.y = int(itemData[2]) - self.height
-        self.life = int(itemData[5])
+        self.max_life = int(itemData[5])
+        self.life = self.max_life
         self.returnType = itemData[6]
         self.returnValue = int(itemData[7])
+        self.marginX = int(itemData[8])
+        self.marginY = int(itemData[9])
 
         self.path = "./itemImages/" + self.type + ".png"
 
         self.size = (self.width, self.height)
-        self.image = etcFuntions.image_load(self.path, self.size, True, (0,0,0))
+        self.image = etcFuntions.image_load(self.path, self.size)
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 
         self.mouse_sprite = guideSprites.MouseGuide()
         self.guide = pygame.sprite.Group()
-        self.guide.add(guideSprites.ItemGuide((self.x, self.y), (100, 100), "Type\n"
-                                                                             "%s\n"
-                                                                             "Return\n"
-                                                                             "%s\n"
-                                                                             "Return Value\n"
-                                                                             "%d"
+        self.lifebar = guideSprites.LifeBar()
+        self.guide.add(guideSprites.ItemGuide((self.x + self.marginX, self.y + self.marginY), (100, 100),
+                                              "Type\n"
+                                              "%s\n"
+                                              "Return\n"
+                                              "%s\n"
+                                              "Return Value\n"
+                                              "%d"
                                               % (self.type, self.returnType, self.returnValue), (0, 0)))
 
     def mined(self, damage):
@@ -44,9 +49,10 @@ class Item(pygame.sprite.Sprite):
 
     def update(self):
         self.mouse_sprite.update()
-
         self.rect.x, self.rect.y = self.x, self.y
-        self.image.set_alpha(255 - self.life)
+
+        if self.life != self.max_life:
+            self.lifebar.draw(self.window, self.rect.x + (self.width / 2 - 5), self.y - 4, self.life, self.max_life)
 
         if pygame.sprite.collide_mask(self, self.mouse_sprite):
             self.guide.update()
