@@ -9,8 +9,15 @@ class GameData:
         # 게임 흐름
         self.gameState = data.gameStateList["lobby"]
         self.stageNum = 0
-        self.stageBackgroundImageList = ["./background/stage1_background1.png", "./background/stage1_background2.png"]
-        self.stageTileImageList = ["./tiles/stage1_main1.png", "./tiles/stage1_main2.png"]
+
+        self.stageTileImageList = []
+        self.stageBackgroundImageList = []
+        f = open("./UserFile/Stage/stageNum.txt", "r")
+        self.maxStageNum = int(f.readline())
+        f.close()
+        for i in range(self.maxStageNum):
+            self.stageTileImageList.append("./UserFile/Stage/tile" + str(i + 1) + ".png")
+            self.stageBackgroundImageList.append("./UserFile/Stage/background" + str(i + 1) + ".png")
         self.goNext = True
         self.isClicked = 0
         # self.ticksForAll = 0
@@ -27,8 +34,18 @@ class GameData:
         self.playerPosForChangeStage = []
         self.background = etcFuntions.image_load(self.stageBackgroundImageList[0], data.screen)
 
-    def init_stage(self, sprite_groups, goNext):
+    def init_item(self, window):
+        item_file = open("./UserFile/Stage/item" + str(self.stageNum + 1) + ".txt", "r")
+        item_list = item_file.read().split("\n")
+        self.item_groups = ItemGroups(item_list, window)
+        item_file.close()
+
+    def init_sprite_groups(self, sprite_groups):
+        self.sprite_groups = sprite_groups
+
+    def init_stage(self, sprite_groups, goNext, window):
         self.gameState = data.gameStateList["changeStage"]
+
         self.ticksForStageChange = 0
         self.backgroundPos = [0, 0]
         self.goNext = goNext
@@ -36,6 +53,13 @@ class GameData:
             self.stageNum += 1
         else:
             self.stageNum -= 1
+
+        item_file = open("./UserFile/Stage/item" + str(self.stageNum + 1) + ".txt", "r")
+        item_list = item_file.read().split("\n")
+        print(item_list)
+        self.item_groups = ItemGroups(item_list, window)
+        item_file.close()
+
         self.playerPosForChangeStage = [sprite_groups.player.x, sprite_groups.player.y]
         self.backgroundPreImage = self.background
         self.backgroundNewImage = etcFuntions.image_load(self.stageBackgroundImageList[self.stageNum], data.screen)
@@ -44,6 +68,12 @@ class GameData:
 
     def get_recent_stage_images(self):
         return self.stageBackgroundImageList[self.stageNum], self.stageTileImageList[self.stageNum]
+
+    def get_game_data(self):
+        return self
+
+
+gameFlowData = GameData()
 
 
 class SpriteGroups:
@@ -68,8 +98,14 @@ class SpriteGroups:
         self.t_tile.kill()
 
     def init_player(self, x, y):
+        self.player_group.empty()
         self.player = players.Player(x, y, self.t_tile)
         self.player_group.add(self.player)
+
+    def init_enemy(self, enemyData):
+        self.enemy_group.empty()
+        #for e in enemyData:
+
 
     def update_sprites(self, window):
         self.tile_group.update()
@@ -79,6 +115,9 @@ class SpriteGroups:
         self.player_group.update()
         self.player_group.draw(window)
 
+        self.enemy_group.update()
+        self.enemy_group.draw(window)
+
 
 class ItemGroups:
     def __init__(self, itemList, window):
@@ -87,7 +126,8 @@ class ItemGroups:
 
         self.itemList = itemList
         for i in itemList:
-            self.item_group.add(itemSprites.Item(i.split(), self.window))
+            if not i == "":
+                self.item_group.add(itemSprites.Item(i.split(), self.window))
 
     def update_item(self):
         self.item_group.update()

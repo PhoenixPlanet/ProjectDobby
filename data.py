@@ -2,7 +2,11 @@
 screen = (720, 480)
 
 # 캐릭터, 타일 크기 설정
-playerSize = (33, 48)
+playerSize = (30, 50)
+basic_tileSize = (30, 30)
+
+lifeBarSize = (20, 3)
+
 dummyMargin = int(playerSize[0] / 4.7)
 dummyPlayerSize = (playerSize[0] - dummyMargin*2, playerSize[1])
 tileSize = screen
@@ -14,6 +18,8 @@ FPS = 60
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 SEMI_SKY = (214, 255, 255)
+GREY = (189, 189, 189)
+SEMI_BLACK = (93, 93, 93)
 
 # 플레이어 이동 속도, 애니메이션 프레임
 pXVel = 2

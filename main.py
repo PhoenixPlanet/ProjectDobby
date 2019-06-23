@@ -13,7 +13,7 @@ pygame.init()
 screen = data.screen
 window = pygame.display.set_mode(screen)
 pygame.display.set_caption("Project Dobby")
-background = etcFuntions.image_load("./background/stage1_background1.png", screen)
+background = etcFuntions.image_load("./UserFile/Stage/background1.png", screen)
 lobbyBackground = etcFuntions.image_load("./background/lobby.png", screen)
 # 게임 아이콘: 나중에 변경할 것
 # pygame.display.set_icon()
@@ -34,31 +34,26 @@ dummy_group = pygame.sprite.Group()
 
 # 스프라이트 그룹들을 모아놓은 클래스
 sprite_groups = gamedata.SpriteGroups()
-sprite_groups.add_tile("./tiles/stage1_main1.png", 0, 0)
+sprite_groups.add_tile("./UserFile/Stage/tile1.png", 0, 0)
 sprite_groups.init_player(50, 200)
 
 howToMoveSprite = 0
 
-gameFlowData = gamedata.GameData()
+gameFlowData = gamedata.gameFlowData.get_game_data()
+gameFlowData.init_item(window)
 
 # def set_stage(stageNumber):
 
 def initialize():
     global gameState, stageNum
 
-    item_file = open("./itemContentLists/stage1.txt", "r")
-    item_list = item_file.read().split("\n")
-    item_groups = gamedata.ItemGroups(item_list, window)
-    item_file.close()
-
     text_group.add(textSprites.Text(70, 140, (110, 60), "./textImage/play.png", "play"))
     gameFlowData.gameState = data.gameStateList["lobby"]
     gameFlowData.stageNum = 0
 
-    return item_groups
+initialize()
 
-
-item_group = initialize()
+item_group = gameFlowData.item_groups
 
 while True:
     clock.tick_busy_loop(data.FPS)
@@ -88,20 +83,17 @@ while True:
                         ticksForAll = 0
 
     elif gameFlowData.gameState == data.gameStateList["normal"]:
+        item_group = gameFlowData.item_groups
         window.fill(data.SEMI_SKY)
         window.blit(gameFlowData.background, gameFlowData.backgroundPos)
 
         item_group.update_item()
         sprite_groups.update_sprites(window)
 
+        gameFlowData.init_sprite_groups(sprite_groups)
+
         if ticksForAll == 100:
-            howToMoveSprite = guideSprites.Guide(0, 20, (132, 93), "./guideImage/guide1.png", "howToMove")
-            """howToMoveSprite = guideSprites.ItemGuide((200, 200), (100, 100), "Type\n"
-                                                                             "Rock\n"
-                                                                             "Return\n"
-                                                                             "Rock\n"
-                                                                             "Return Value\n"
-                                                                             "3", (0, 0))"""
+            howToMoveSprite = guideSprites.Guide(300, 20, (132, 93), "./guideImage/guide1.png", "howToMove")
             guide_group.add(howToMoveSprite)
 
         elif 500 >= ticksForAll > 100:
@@ -110,15 +102,18 @@ while True:
         elif ticksForAll > 500:
             howToMoveSprite.kill()
 
-        if sprite_groups.player.rect.centerx >= 680 and gameFlowData.stageNum < len(
-                gameFlowData.stageBackgroundImageList) - 1:
-            gameFlowData.init_stage(sprite_groups, True)
+        if sprite_groups.player.rect.centerx >= 680 and \
+                gameFlowData.stageNum < len(gameFlowData.stageBackgroundImageList) - 1:
+            gameFlowData.init_stage(sprite_groups, True, window)
 
         if sprite_groups.player.rect.centerx <= 40 and gameFlowData.stageNum > 0:
-            gameFlowData.init_stage(sprite_groups, False)
+            gameFlowData.init_stage(sprite_groups, False, window)
 
     elif gameFlowData.gameState == data.gameStateList["changeStage"]:
         stageFunctions.change_stage(window, gameFlowData, sprite_groups, item_group)
+
+    if not pygame.mouse.get_pressed()[0]:
+        gamedata.gameFlowData.get_game_data().isClicked = False
 
     # fontObj = pygame.font.Font('./Fonts/caviar_dreams/CaviarDreams.ttf', 16)
     fontObj = pygame.font.Font('./Fonts/NanumGothic.ttf', 16)
