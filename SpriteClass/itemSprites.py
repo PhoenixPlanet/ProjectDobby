@@ -9,8 +9,9 @@ class Item(pygame.sprite.Sprite):
     def __init__(self, itemData, window):
         pygame.sprite.Sprite.__init__(self)
 
-        self.itemData = itemData
         self.window = window
+
+        self.itemData = itemData
 
         self.type = itemData[0]
         self.x = int(itemData[1])

@@ -2,7 +2,7 @@ import data
 from etc import etcFuntions
 
 
-def change_stage(window, gameData, spriteGroups, itemgroups):
+def change_stage(window, gameData, spriteGroups):
     window.fill(data.SEMI_SKY)
 
     t = gameData.ticksForStageChange
@@ -16,8 +16,6 @@ def change_stage(window, gameData, spriteGroups, itemgroups):
 
     backgroundDX = a * ((t ** 2) - (data.changeStageSpeed * t))
     gameData.backgroundPos[0] += backgroundDX
-    for i in itemgroups.item_group:
-        i.x += backgroundDX
 
     if gameData.goNext:
         newX = gameData.backgroundPos[0] + data.screen[0]

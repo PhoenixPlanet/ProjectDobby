@@ -40,25 +40,24 @@ sprite_groups.init_player(50, 200)
 howToMoveSprite = 0
 
 gameFlowData = gamedata.gameFlowData.get_game_data()
-gameFlowData.init_item(window)
+gameFlowData.set_window(window)
+gameFlowData.set_sprite_groups()
 
-# def set_stage(stageNumber):
 
-def initialize():
-    global gameState, stageNum
+text_group.add(textSprites.Text(70, 140, (110, 60), "./textImage/play.png", "play"))
 
-    text_group.add(textSprites.Text(70, 140, (110, 60), "./textImage/play.png", "play"))
-    gameFlowData.gameState = data.gameStateList["lobby"]
-    gameFlowData.stageNum = 0
 
-initialize()
+etcFuntions.gameInit(gameFlowData)
 
-item_group = gameFlowData.item_groups
 
 while True:
     clock.tick_busy_loop(data.FPS)
+
     if (not pygame.mouse.get_pressed()[0]) and isClicked == 1:
         isClicked = 0
+
+    if not pygame.mouse.get_pressed()[0]:
+        gamedata.gameFlowData.get_game_data().isClicked = False
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -83,14 +82,10 @@ while True:
                         ticksForAll = 0
 
     elif gameFlowData.gameState == data.gameStateList["normal"]:
-        item_group = gameFlowData.item_groups
         window.fill(data.SEMI_SKY)
         window.blit(gameFlowData.background, gameFlowData.backgroundPos)
 
-        item_group.update_item()
-        sprite_groups.update_sprites(window)
-
-        gameFlowData.init_sprite_groups(sprite_groups)
+        gameFlowData.sprite_groups.update_sprites(window)
 
         if ticksForAll == 100:
             howToMoveSprite = guideSprites.Guide(300, 20, (132, 93), "./guideImage/guide1.png", "howToMove")
@@ -102,26 +97,17 @@ while True:
         elif ticksForAll > 500:
             howToMoveSprite.kill()
 
-        if sprite_groups.player.rect.centerx >= 680 and \
+        if gameFlowData.sprite_groups.player.rect.centerx >= 680 and \
                 gameFlowData.stageNum < len(gameFlowData.stageBackgroundImageList) - 1:
-            gameFlowData.init_stage(sprite_groups, True, window)
+            gameFlowData.init_stage(True)
 
-        if sprite_groups.player.rect.centerx <= 40 and gameFlowData.stageNum > 0:
-            gameFlowData.init_stage(sprite_groups, False, window)
+        if gameFlowData.sprite_groups.player.rect.centerx <= 40 and gameFlowData.stageNum > 0:
+            gameFlowData.init_stage(False)
 
     elif gameFlowData.gameState == data.gameStateList["changeStage"]:
-        stageFunctions.change_stage(window, gameFlowData, sprite_groups, item_group)
+        gameFlowData.change_stage()
 
-    if not pygame.mouse.get_pressed()[0]:
-        gamedata.gameFlowData.get_game_data().isClicked = False
-
-    # fontObj = pygame.font.Font('./Fonts/caviar_dreams/CaviarDreams.ttf', 16)
-    fontObj = pygame.font.Font('./Fonts/NanumGothic.ttf', 16)
-    textSurfaceObj = fontObj.render("x: %d, y: %d" % (pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), True,
-                                    (0, 0, 0))
-    textRectObj = textSurfaceObj.get_rect()
-    textRectObj.center = (360, 10)
-    window.blit(textSurfaceObj, textRectObj)
+    etcFuntions.showMousePos(window)
 
     pygame.display.flip()
 

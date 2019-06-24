@@ -14,12 +14,13 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 pygame.init()
 
 # 게임 화면 설정(확인해본 결과 (1440, 960), (1280, 1080) 정도 되면 연산속도가 눈에 띌 정도로 느려짐)
-screen = data.screen
+screen = data.mapEditorScreen
 window = pygame.display.set_mode(screen)
 pygame.display.set_caption("Project Dobby")
 clock = pygame.time.Clock()
 fontObj = pygame.font.Font('./Fonts/NanumGothic.ttf', 11)
 
+# 스테이지 개수 받아오기
 stageNumFile = open("./UserFile/Stage/stageNum.txt", "r")
 stageNum = int(stageNumFile.readline())
 stageNumFile.close()
@@ -79,7 +80,7 @@ def renderTile():
         for j in range(16):
             if tileList[i][j] > 0:
                 tile_surface.blit(sub_menu_tile_image[tileList[i][j] - 1], (30 * i, 30 * j))
-    window.blit(tile_surface, (0, 0))
+    window.blit(tile_surface, (0, 70))
 
 
 def renderItem():
@@ -89,12 +90,11 @@ def renderItem():
         for j in range(16):
             if itemList[i][j] > 0:
                 item_surface.blit(sub_menu_item_image[itemList[i][j] - 1], (30 * i, 30 * j))
-    window.blit(item_surface, (0, 0))
+    window.blit(item_surface, (0, 70))
 
 
 def checkMousePosition():
-    mousePos = [int(pygame.mouse.get_pos()[0] // 30), int(pygame.mouse.get_pos()[1] // 30)]
-    return mousePos
+    return int(pygame.mouse.get_pos()[0] // 30), int((pygame.mouse.get_pos()[1] - 70) // 30)
 
 
 while True:
@@ -110,10 +110,10 @@ while True:
 
     # 가이드 라인
     for i in range(int(720 / 30)):
-        pygame.draw.line(window, data.GREY, (30 * i, 0), (30 * i, 480))
+        pygame.draw.line(window, data.GREY, (30 * i, 70), (30 * i, 550))
 
     for i in range(int(480 / 30)):
-        pygame.draw.line(window, data.GREY, (0, 30 * i), (720, 30 * i))
+        pygame.draw.line(window, data.GREY, (0, 30 * i + 70), (720, 30 * i + 70))
 
     renderItem()
     renderTile()
@@ -142,6 +142,7 @@ while True:
                 current_sub_menu = -1
 
     if menu_state == 1:
+        # 세이브 메뉴
         if current_menu == 5:
             stageNumFile = open("./UserFile/Stage/stageNum.txt", "w")
             stageNum += 1
@@ -160,6 +161,25 @@ while True:
             itemF.close()
             quit()
             sys.exit()
+
+        # 타일 메뉴 선택했을 때
+        if current_menu == 0:
+            if pygame.mouse.get_pos()[1] >= 70:
+                window.blit(sub_menu_tile_image[current_sub_menu],
+                            (30 * checkMousePosition()[0], 30 * checkMousePosition()[1] + 70))
+                if pygame.mouse.get_pressed()[0] and click_available:
+                    i, j = checkMousePosition()
+                    tileList[i][j] = current_sub_menu + 1
+
+        # 아이템 선택했을 때
+        if current_menu == 1:
+            if checkMousePosition()[1] >= 70:
+                window.blit(sub_menu_item_image[current_sub_menu],
+                            (30 * checkMousePosition()[0], 30 * checkMousePosition()[1] + 70))
+                if pygame.mouse.get_pressed()[0] and click_available:
+                    i, j = checkMousePosition()
+                    itemList[i][j] = current_sub_menu + 1
+
         pygame.draw.rect(window, data.SEMI_BLACK, outer_sub_menu)
         if current_menu != 4:
             for i in range(len(sub_menu[current_menu])):
@@ -179,24 +199,6 @@ while True:
                     and pygame.mouse.get_pressed()[0] and click_available:
                 click_available = False
                 current_sub_menu = -1
-
-        # 타일 선택했을 때
-        if current_menu == 0:
-            window.blit(sub_menu_tile_image[current_sub_menu],
-                        (30 * checkMousePosition()[0], 30 * checkMousePosition()[1]))
-            if pygame.mouse.get_pressed()[0] and click_available:
-                i, j = checkMousePosition()
-                if j > 1:
-                    tileList[i][j] = current_sub_menu + 1
-
-        # 아이템 선택했을 때
-        if current_menu == 1:
-            window.blit(sub_menu_item_image[current_sub_menu],
-                        (30 * checkMousePosition()[0], 30 * checkMousePosition()[1]))
-            if pygame.mouse.get_pressed()[0] and click_available:
-                i, j = checkMousePosition()
-                if j > 1:
-                    itemList[i][j] = current_sub_menu + 1
 
     clock.tick_busy_loop(data.FPS)
     pygame.display.flip()

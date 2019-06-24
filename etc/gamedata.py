@@ -2,7 +2,72 @@ from . import etcFuntions
 import data
 import pygame
 from SpriteClass import tiles, players, itemSprites, guideSprites
+from etc import stageFunctions
 
+
+class SpriteGroups:
+    t_tile: tiles.Tile
+    player: players.Player
+
+    def __init__(self):
+        self.tile_group = pygame.sprite.Group()
+        self.enemy_group = pygame.sprite.Group()
+        self.player_group = pygame.sprite.Group()
+        self.text_group = pygame.sprite.Group()
+        self.guide_group = pygame.sprite.Group()
+
+        self.player = 0
+        self.t_tile = 0
+
+    def init_item(self, stageNum, window):
+        item_file = open("./UserFile/Stage/item" + str(stageNum + 1) + ".txt", "r")
+        item_list = item_file.read().split("\n")
+        self.item_groups = ItemGroups(item_list, window)
+        item_file.close()
+
+    def add_tile(self, path, x, y):
+        self.t_tile = tiles.Tile(path, x, y)
+        self.tile_group.add(self.t_tile)
+
+    def kill_tile(self):
+        self.t_tile.kill()
+
+    def init_player(self, x, y):
+        self.player_group.empty()
+        self.player = players.Player(x, y, self.t_tile)
+        self.player_group.add(self.player)
+
+    def init_enemy(self, enemyData):
+        self.enemy_group.empty()
+        # for e in enemyData:
+
+    def update_sprites(self, window):
+        self.tile_group.update()
+        self.tile_group.draw(window)
+        # window.blit(self.t_tile.image, (self.t_tile.x, self.t_tile.y))
+
+        self.item_groups.update_item(window)
+
+        self.player_group.update()
+        self.player_group.draw(window)
+
+        self.enemy_group.update()
+        self.enemy_group.draw(window)
+
+
+class ItemGroups:
+    def __init__(self, itemList, window):
+        self.item_group = pygame.sprite.Group()
+
+        self.itemList = itemList
+        for i in itemList:
+            if not i == "":
+                self.item_group.add(itemSprites.Item(i.split(), window))
+
+    def update_item(self, window):
+        self.item_group.update()
+        self.item_group.draw(window)
+    
 
 class GameData:
     def __init__(self):
@@ -34,16 +99,7 @@ class GameData:
         self.playerPosForChangeStage = []
         self.background = etcFuntions.image_load(self.stageBackgroundImageList[0], data.screen)
 
-    def init_item(self, window):
-        item_file = open("./UserFile/Stage/item" + str(self.stageNum + 1) + ".txt", "r")
-        item_list = item_file.read().split("\n")
-        self.item_groups = ItemGroups(item_list, window)
-        item_file.close()
-
-    def init_sprite_groups(self, sprite_groups):
-        self.sprite_groups = sprite_groups
-
-    def init_stage(self, sprite_groups, goNext, window):
+    def init_stage(self, goNext):
         self.gameState = data.gameStateList["changeStage"]
 
         self.ticksForStageChange = 0
@@ -54,16 +110,12 @@ class GameData:
         else:
             self.stageNum -= 1
 
-        item_file = open("./UserFile/Stage/item" + str(self.stageNum + 1) + ".txt", "r")
-        item_list = item_file.read().split("\n")
-        print(item_list)
-        self.item_groups = ItemGroups(item_list, window)
-        item_file.close()
+        self.sprite_groups.init_item(self.stageNum, self.window)
 
-        self.playerPosForChangeStage = [sprite_groups.player.x, sprite_groups.player.y]
+        self.playerPosForChangeStage = [self.sprite_groups.player.x, self.sprite_groups.player.y]
         self.backgroundPreImage = self.background
         self.backgroundNewImage = etcFuntions.image_load(self.stageBackgroundImageList[self.stageNum], data.screen)
-        self.tilePreImage = sprite_groups.t_tile.image
+        self.tilePreImage = self.sprite_groups.t_tile.image
         self.tileNewImage = etcFuntions.image_load(self.stageTileImageList[self.stageNum], data.screen)
 
     def get_recent_stage_images(self):
@@ -72,64 +124,17 @@ class GameData:
     def get_game_data(self):
         return self
 
+    def change_stage(self):
+        stageFunctions.change_stage(self.window, gameFlowData, self.sprite_groups)
 
-gameFlowData = GameData()
-
-
-class SpriteGroups:
-    t_tile: tiles.Tile
-    player: players.Player
-
-    def __init__(self):
-        self.tile_group = pygame.sprite.Group()
-        self.enemy_group = pygame.sprite.Group()
-        self.player_group = pygame.sprite.Group()
-        self.text_group = pygame.sprite.Group()
-        self.guide_group = pygame.sprite.Group()
-
-        self.player = 0
-        self.t_tile = 0
-
-    def add_tile(self, path, x, y):
-        self.t_tile = tiles.Tile(path, x, y)
-        self.tile_group.add(self.t_tile)
-
-    def kill_tile(self):
-        self.t_tile.kill()
-
-    def init_player(self, x, y):
-        self.player_group.empty()
-        self.player = players.Player(x, y, self.t_tile)
-        self.player_group.add(self.player)
-
-    def init_enemy(self, enemyData):
-        self.enemy_group.empty()
-        #for e in enemyData:
-
-
-    def update_sprites(self, window):
-        self.tile_group.update()
-        self.tile_group.draw(window)
-        #window.blit(self.t_tile.image, (self.t_tile.x, self.t_tile.y))
-
-        self.player_group.update()
-        self.player_group.draw(window)
-
-        self.enemy_group.update()
-        self.enemy_group.draw(window)
-
-
-class ItemGroups:
-    def __init__(self, itemList, window):
-        self.item_group = pygame.sprite.Group()
+    def set_window(self, window):
         self.window = window
 
-        self.itemList = itemList
-        for i in itemList:
-            if not i == "":
-                self.item_group.add(itemSprites.Item(i.split(), self.window))
+    def set_sprite_groups(self):
+        self.sprite_groups = SpriteGroups()
+        self.sprite_groups.add_tile("./UserFile/Stage/tile1.png", 0, 0)
+        self.sprite_groups.init_player(50, 200)
+        self.sprite_groups.init_item(self.stageNum, self.window)
 
-    def update_item(self):
-        self.item_group.update()
-        self.item_group.draw(self.window)
 
+gameFlowData = GameData()
